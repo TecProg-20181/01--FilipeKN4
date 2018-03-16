@@ -6,17 +6,13 @@ typedef struct _pixel {
     unsigned short int b;
 } Pixel;
 
-typedef struct _image {
-    // [width][height][rgb]
-    // 0 -> r
-    // 1 -> g
-    // 2 -> b
+typedef struct image {
     unsigned short int pixel[512][512][3];
     unsigned int w;
     unsigned int h;
 } Image;
 
-
+/*
 int max(int a, int b) {
     if (a > b)
         return a;
@@ -30,7 +26,7 @@ int pixel_igual(Pixel p1, Pixel p2) {
         return 1;
     return 0;
 }
-
+*/
 
 Image escala_de_cinza(Image img) {
     /*for (unsigned int i = 0; i < img.h; ++i) {
