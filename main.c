@@ -58,7 +58,10 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
-Image blur(Image img, int T) {
+Image blur(Image img) {
+    int T = 0;
+    scanf("%d", &T);
+
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
             Pixel media = {0, 0, 0};
@@ -104,6 +107,18 @@ Image rotacionar90direita(Image img) {
     return rotacionada;
 }
 
+Image aplicar_rotacao(Image img) {
+    int quantas_vezes = 0;
+    scanf("%d", &quantas_vezes);
+    quantas_vezes %= 4;
+
+    for (int j = 0; j < quantas_vezes; ++j) {
+        img = rotacionar90direita(img);
+  }
+
+  return img;
+}
+
 void inverter_cores(unsigned short int pixel[512][512][3],
                     unsigned int width, unsigned int height) {
     for (unsigned int i = 0; i < height; ++i) {
@@ -132,7 +147,8 @@ Image cortar_imagem(Image img, int x, int y, int width, int height) {
     return cortada;
 }
 
-int calcular_menor_r(double argumento_1, double argumento_2, double argumento_3, unsigned short int *pixel) {
+int calcular_menor_r(double argumento_1, double argumento_2,
+                     double argumento_3, unsigned short int *pixel) {
   int p =  pixel[0] * argumento_1 + pixel[1] * argumento_2 + pixel[2] * argumento_3;
   //int menor_r = (255 >  p) ? p : 255;
   int menor_r;
@@ -218,18 +234,11 @@ int main() {
                 break;
             }
             case 3: { // Blur
-                int tamanho = 0;
-                scanf("%d", &tamanho);
-                img = blur(img, tamanho);
+                img = blur(img);
                 break;
             }
             case 4: { // Rotacao
-                int quantas_vezes = 0;
-                scanf("%d", &quantas_vezes);
-                quantas_vezes %= 4;
-                for (int j = 0; j < quantas_vezes; ++j) {
-                    img = rotacionar90direita(img);
-                }
+                img = aplicar_rotacao(img);
                 break;
             }
             case 5: { // Espelhamento
