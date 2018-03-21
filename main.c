@@ -12,6 +12,30 @@ typedef struct image {
     unsigned int height;
 } Image;
 
+Image ler_imagem(Image img) {
+
+  // read type of image
+  char p3[4];
+  scanf("%s", p3);
+
+  // read width height and color of image
+  int max_color;
+  scanf("%u %u %d", &img.width, &img.height, &max_color);
+
+  // read all pixels of image
+  for (unsigned int i = 0; i < img.height; ++i) {
+      for (unsigned int j = 0; j < img.width; ++j) {
+          scanf("%hu %hu %hu", &img.pixel[i][j][0],
+                               &img.pixel[i][j][1],
+                               &img.pixel[i][j][2]);
+
+      }
+  }
+
+  return img;
+
+}
+
 Image escala_de_cinza(Image img) {
     /*for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
@@ -34,18 +58,18 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
-void blur(unsigned int height, unsigned short int pixel[512][512][3], int T, unsigned int width) {
-    for (unsigned int i = 0; i < height; ++i) {
-        for (unsigned int j = 0; j < width; ++j) {
+Image blur(Image img, int T) {
+    for (unsigned int i = 0; i < img.height; ++i) {
+        for (unsigned int j = 0; j < img.width; ++j) {
             Pixel media = {0, 0, 0};
 
-            int menor_height = (height - 1 > i + T/2) ? i + T/2 : height - 1;
-            int min_width = (width - 1 > j + T/2) ? j + T/2 : width - 1;
+            int menor_height = (img.height - 1 > i + T/2) ? i + T/2 : img.height - 1;
+            int min_width = (img.width - 1 > j + T/2) ? j + T/2 : img.width - 1;
             for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
                 for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
-                    media.r += pixel[x][y][0];
-                    media.g += pixel[x][y][1];
-                    media.b += pixel[x][y][2];
+                    media.r += img.pixel[x][y][0];
+                    media.g += img.pixel[x][y][1];
+                    media.b += img.pixel[x][y][2];
                 }
             }
 
@@ -54,11 +78,13 @@ void blur(unsigned int height, unsigned short int pixel[512][512][3], int T, uns
             media.g /= T * T;
             media.b /= T * T;
 
-            pixel[i][j][0] = media.r;
-            pixel[i][j][1] = media.g;
-            pixel[i][j][2] = media.b;
+            img.pixel[i][j][0] = media.r;
+            img.pixel[i][j][1] = media.g;
+            img.pixel[i][j][2] = media.b;
         }
     }
+
+    return img;
 }
 
 Image rotacionar90direita(Image img) {
@@ -168,23 +194,7 @@ Image espelhamento_vertical(Image img) {
 int main() {
     Image img;
 
-    // read type of image
-    char p3[4];
-    scanf("%s", p3);
-
-    // read width height and color of image
-    int max_color;
-    scanf("%u %u %d", &img.width, &img.height, &max_color);
-
-    // read all pixels of image
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            scanf("%hu %hu %hu", &img.pixel[i][j][0],
-                                 &img.pixel[i][j][1],
-                                 &img.pixel[i][j][2]);
-
-        }
-    }
+    img = ler_imagem(img);
 
     int n_opcoes;
     scanf("%d", &n_opcoes);
@@ -205,7 +215,7 @@ int main() {
             case 3: { // Blur
                 int tamanho = 0;
                 scanf("%d", &tamanho);
-                blur(img.height, img.pixel, tamanho, img.width);
+                img = blur(img, tamanho);
                 break;
             }
             case 4: { // Rotacao
