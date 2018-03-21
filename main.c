@@ -132,6 +132,19 @@ Image cortar_imagem(Image img, int x, int y, int width, int height) {
     return cortada;
 }
 
+int calcular_menor_r(double argumento_1, double argumento_2, double argumento_3, unsigned short int *pixel) {
+  int p =  pixel[0] * argumento_1 + pixel[1] * argumento_2 + pixel[2] * argumento_3;
+  //int menor_r = (255 >  p) ? p : 255;
+  int menor_r;
+  if (255 > p) {
+    menor_r = p;
+  } else {
+    menor_r = 255;
+  }
+
+  return menor_r;
+}
+
 Image filtro_sepia(Image img) {
   for (unsigned int x = 0; x < img.height; ++x) {
       for (unsigned int j = 0; j < img.width; ++j) {
@@ -140,17 +153,9 @@ Image filtro_sepia(Image img) {
           pixel[1] = img.pixel[x][j][1];
           pixel[2] = img.pixel[x][j][2];
 
-          int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
-          int menor_r = (255 >  p) ? p : 255;
-          img.pixel[x][j][0] = menor_r;
-
-          p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
-          menor_r = (255 >  p) ? p : 255;
-          img.pixel[x][j][1] = menor_r;
-
-          p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
-          menor_r = (255 >  p) ? p : 255;
-          img.pixel[x][j][2] = menor_r;
+          img.pixel[x][j][0] = calcular_menor_r(0.393, 0.769, 0.189, pixel);
+          img.pixel[x][j][1] = calcular_menor_r(0.349, 0.686, 0.168, pixel);
+          img.pixel[x][j][2] = calcular_menor_r(0.272, 0.534, 0.131, pixel);
       }
   }
 
