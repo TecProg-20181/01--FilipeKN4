@@ -120,9 +120,7 @@ Image rotacionar90direita(Image img) {
 
     for (unsigned int i = 0, y = 0; i < rotacionada.height; ++i, ++y) {
         for (int j = rotacionada.width - 1, x = 0; j >= 0; --j, ++x) {
-            rotacionada.pixel[i][j].r = img.pixel[x][y].r;
-            rotacionada.pixel[i][j].g = img.pixel[x][y].g;
-            rotacionada.pixel[i][j].b = img.pixel[x][y].b;
+            rotacionada.pixel[i][j] = img.pixel[x][y];
         }
     }
 
@@ -141,12 +139,18 @@ Image aplicar_rotacao(Image img) {
   return img;
 }
 
+Pixel subtrair_de_cor_max(Pixel pixel) {
+    pixel.r = 255 - pixel.r;
+    pixel.g = 255 - pixel.g;
+    pixel.b = 255 - pixel.b;
+
+  return pixel;
+}
+
 Image inverter_cores(Image img) {
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            img.pixel[i][j].r = 255 - img.pixel[i][j].r;
-            img.pixel[i][j].g = 255 - img.pixel[i][j].g;
-            img.pixel[i][j].b = 255 - img.pixel[i][j].b;
+            img.pixel[i][j] = subtrair_de_cor_max(img.pixel[i][j]);
         }
     }
     return img;
