@@ -36,6 +36,12 @@ Image ler_imagem(Image img) {
 
 }
 
+int media_escala_de_cinza(int argumento1, int argumento2, int argumento3) {
+    int soma = argumento1 + argumento2 + argumento3;
+
+    return soma/3;
+}
+
 Image escala_de_cinza(Image img) {
     /*for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
@@ -45,10 +51,10 @@ Image escala_de_cinza(Image img) {
 
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            int media = img.pixel[i][j][0] +
-                        img.pixel[i][j][1] +
-                        img.pixel[i][j][2];
-            media /= 3;
+            int media = media_escala_de_cinza(img.pixel[i][j][0],
+                                              img.pixel[i][j][1],
+                                              img.pixel[i][j][2]);
+
             img.pixel[i][j][0] = media;
             img.pixel[i][j][1] = media;
             img.pixel[i][j][2] = media;
@@ -68,8 +74,8 @@ Image blur(Image img) {
 
             int menor_height = (img.height - 1 > i + T/2) ? i + T/2 : img.height - 1;
             int min_width = (img.width - 1 > j + T/2) ? j + T/2 : img.width - 1;
-            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
-                for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
+            for(unsigned int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
+                for(unsigned int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
                     media.r += img.pixel[x][y][0];
                     media.g += img.pixel[x][y][1];
                     media.b += img.pixel[x][y][2];
@@ -130,8 +136,13 @@ Image inverter_cores(Image img) {
     return img;
 }
 
-Image cortar_imagem(Image img, int x, int y, int width, int height) {
+Image cortar_imagem(Image img) {
     Image cortada;
+
+    int x, y;
+    scanf("%d %d", &x, &y);
+    int width, height;
+    scanf("%d %d", &width, &height);
 
     cortada.width = width;
     cortada.height = height;
@@ -212,6 +223,24 @@ Image espelhamento_vertical(Image img) {
   return img;
 }
 
+void mostrar_imagem(Image img) {
+    // print type of image
+    printf("P3\n");
+    // print width height and color of image
+    printf("%u %u\n255\n", img.width, img.height);
+
+    // print pixels of image
+    for (unsigned int i = 0; i < img.height; ++i) {
+        for (unsigned int j = 0; j < img.width; ++j) {
+            printf("%hu %hu %hu ", img.pixel[i][j][0],
+                                   img.pixel[i][j][1],
+                                   img.pixel[i][j][2]);
+
+        }
+        printf("\n");
+    }
+}
+
 int main() {
     Image img;
 
@@ -250,32 +279,13 @@ int main() {
                 break;
             }
             case 7: { // Cortar Imagem
-                int x, y;
-                scanf("%d %d", &x, &y);
-                int width, height;
-                scanf("%d %d", &width, &height);
-
-                img = cortar_imagem(img, x, y, width, height);
+                img = cortar_imagem(img);
                 break;
             }
         }
 
     }
+    mostrar_imagem(img);
 
-    // print type of image
-    printf("P3\n");
-    // print width height and color of image
-    printf("%u %u\n255\n", img.width, img.height);
-
-    // print pixels of image
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            printf("%hu %hu %hu ", img.pixel[i][j][0],
-                                   img.pixel[i][j][1],
-                                   img.pixel[i][j][2]);
-
-        }
-        printf("\n");
-    }
     return 0;
 }
