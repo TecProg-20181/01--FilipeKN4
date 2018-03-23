@@ -1,13 +1,13 @@
 #include <stdio.h>
 
-typedef struct _pixel {
+typedef struct pixel {
     unsigned short int r;
     unsigned short int g;
     unsigned short int b;
 } Pixel;
 
 typedef struct image {
-    unsigned short int pixel[512][512][3];
+    Pixel pixel[512][512];
     unsigned int width;
     unsigned int height;
 } Image;
@@ -25,15 +25,21 @@ Image ler_imagem(Image img) {
   // read all pixels of image
   for (unsigned int i = 0; i < img.height; ++i) {
       for (unsigned int j = 0; j < img.width; ++j) {
-          scanf("%hu %hu %hu", &img.pixel[i][j][0],
-                               &img.pixel[i][j][1],
-                               &img.pixel[i][j][2]);
+          scanf("%hu %hu %hu", &img.pixel[i][j].r,
+                               &img.pixel[i][j].g,
+                               &img.pixel[i][j].b);
 
       }
   }
 
   return img;
 
+}
+
+int max(int a, int b) {
+  if (a > b)
+    return b;
+  return a;
 }
 
 int media_escala_de_cinza(int argumento1, int argumento2, int argumento3) {
@@ -45,19 +51,19 @@ int media_escala_de_cinza(int argumento1, int argumento2, int argumento3) {
 Image escala_de_cinza(Image img) {
     /*for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            print("%u", img.pixel[i][j][0] + img.pixel[i][j][1] + img.pixel[i][j][2]);
+            print("%u", img.pixel[i][j].r + img.pixel[i][j].g + img.pixel[i][j].b);
         }
     }*/
 
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            int media = media_escala_de_cinza(img.pixel[i][j][0],
-                                              img.pixel[i][j][1],
-                                              img.pixel[i][j][2]);
+            int media = media_escala_de_cinza(img.pixel[i][j].r,
+                                              img.pixel[i][j].g,
+                                              img.pixel[i][j].b);
 
-            img.pixel[i][j][0] = media;
-            img.pixel[i][j][1] = media;
-            img.pixel[i][j][2] = media;
+            img.pixel[i][j].r = media;
+            img.pixel[i][j].g = media;
+            img.pixel[i][j].b = media;
         }
     }
 
@@ -76,9 +82,9 @@ Image blur(Image img) {
             int min_width = (img.width - 1 > j + T/2) ? j + T/2 : img.width - 1;
             for(unsigned int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
                 for(unsigned int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
-                    media.r += img.pixel[x][y][0];
-                    media.g += img.pixel[x][y][1];
-                    media.b += img.pixel[x][y][2];
+                    media.r += img.pixel[x][y].r;
+                    media.g += img.pixel[x][y].g;
+                    media.b += img.pixel[x][y].b;
                 }
             }
 
@@ -87,9 +93,9 @@ Image blur(Image img) {
             media.g /= T * T;
             media.b /= T * T;
 
-            img.pixel[i][j][0] = media.r;
-            img.pixel[i][j][1] = media.g;
-            img.pixel[i][j][2] = media.b;
+            img.pixel[i][j].r = media.r;
+            img.pixel[i][j].g = media.g;
+            img.pixel[i][j].b = media.b;
         }
     }
 
@@ -104,9 +110,9 @@ Image rotacionar90direita(Image img) {
 
     for (unsigned int i = 0, y = 0; i < rotacionada.height; ++i, ++y) {
         for (int j = rotacionada.width - 1, x = 0; j >= 0; --j, ++x) {
-            rotacionada.pixel[i][j][0] = img.pixel[x][y][0];
-            rotacionada.pixel[i][j][1] = img.pixel[x][y][1];
-            rotacionada.pixel[i][j][2] = img.pixel[x][y][2];
+            rotacionada.pixel[i][j].r = img.pixel[x][y].r;
+            rotacionada.pixel[i][j].g = img.pixel[x][y].g;
+            rotacionada.pixel[i][j].b = img.pixel[x][y].b;
         }
     }
 
@@ -128,9 +134,9 @@ Image aplicar_rotacao(Image img) {
 Image inverter_cores(Image img) {
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            img.pixel[i][j][0] = 255 - img.pixel[i][j][0];
-            img.pixel[i][j][1] = 255 - img.pixel[i][j][1];
-            img.pixel[i][j][2] = 255 - img.pixel[i][j][2];
+            img.pixel[i][j].r = 255 - img.pixel[i][j].r;
+            img.pixel[i][j].g = 255 - img.pixel[i][j].g;
+            img.pixel[i][j].b = 255 - img.pixel[i][j].b;
         }
     }
     return img;
@@ -149,25 +155,19 @@ Image cortar_imagem(Image img) {
 
     for(int i = 0; i < height; ++i) {
         for(int j = 0; j < width; ++j) {
-            cortada.pixel[i][j][0] = img.pixel[i + y][j + x][0];
-            cortada.pixel[i][j][1] = img.pixel[i + y][j + x][1];
-            cortada.pixel[i][j][2] = img.pixel[i + y][j + x][2];
+            cortada.pixel[i][j].r = img.pixel[i + y][j + x].r;
+            cortada.pixel[i][j].g = img.pixel[i + y][j + x].g;
+            cortada.pixel[i][j].b = img.pixel[i + y][j + x].b;
         }
     }
 
     return cortada;
 }
 
-int calcular_menor_r(double argumento_1, double argumento_2,
-                     double argumento_3, unsigned short int *pixel) {
-  int p =  pixel[0] * argumento_1 + pixel[1] * argumento_2 + pixel[2] * argumento_3;
+int calcular_menor_r(double a, double b, double c, Pixel pixel) {
+  int p =  pixel.r * a + pixel.g * b + pixel.b * c;
   //int menor_r = (255 >  p) ? p : 255;
-  int menor_r;
-  if (255 > p) {
-    menor_r = p;
-  } else {
-    menor_r = 255;
-  }
+  int menor_r = max(255, p);
 
   return menor_r;
 }
@@ -175,14 +175,14 @@ int calcular_menor_r(double argumento_1, double argumento_2,
 Image filtro_sepia(Image img) {
   for (unsigned int x = 0; x < img.height; ++x) {
       for (unsigned int j = 0; j < img.width; ++j) {
-          unsigned short int pixel[3];
-          pixel[0] = img.pixel[x][j][0];
-          pixel[1] = img.pixel[x][j][1];
-          pixel[2] = img.pixel[x][j][2];
+          Pixel pixel;
+          pixel.r = img.pixel[x][j].r;
+          pixel.g = img.pixel[x][j].g;
+          pixel.b = img.pixel[x][j].b;
 
-          img.pixel[x][j][0] = calcular_menor_r(0.393, 0.769, 0.189, pixel);
-          img.pixel[x][j][1] = calcular_menor_r(0.349, 0.686, 0.168, pixel);
-          img.pixel[x][j][2] = calcular_menor_r(0.272, 0.534, 0.131, pixel);
+          img.pixel[x][j].r = calcular_menor_r(0.393, 0.769, 0.189, pixel);
+          img.pixel[x][j].g = calcular_menor_r(0.349, 0.686, 0.168, pixel);
+          img.pixel[x][j].b = calcular_menor_r(0.272, 0.534, 0.131, pixel);
       }
   }
 
@@ -206,17 +206,17 @@ Image espelhamento_vertical(Image img) {
           else x = img.height - 1 - i2;
 
           Pixel aux1;
-          aux1.r = img.pixel[i2][j][0];
-          aux1.g = img.pixel[i2][j][1];
-          aux1.b = img.pixel[i2][j][2];
+          aux1.r = img.pixel[i2][j].r;
+          aux1.g = img.pixel[i2][j].g;
+          aux1.b = img.pixel[i2][j].b;
 
-          img.pixel[i2][j][0] = img.pixel[x][y][0];
-          img.pixel[i2][j][1] = img.pixel[x][y][1];
-          img.pixel[i2][j][2] = img.pixel[x][y][2];
+          img.pixel[i2][j].r = img.pixel[x][y].r;
+          img.pixel[i2][j].g = img.pixel[x][y].g;
+          img.pixel[i2][j].b = img.pixel[x][y].b;
 
-          img.pixel[x][y][0] = aux1.r;
-          img.pixel[x][y][1] = aux1.g;
-          img.pixel[x][y][2] = aux1.b;
+          img.pixel[x][y].r = aux1.r;
+          img.pixel[x][y].g = aux1.g;
+          img.pixel[x][y].b = aux1.b;
       }
   }
 
@@ -232,9 +232,9 @@ void mostrar_imagem(Image img) {
     // print pixels of image
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            printf("%hu %hu %hu ", img.pixel[i][j][0],
-                                   img.pixel[i][j][1],
-                                   img.pixel[i][j][2]);
+            printf("%hu %hu %hu ", img.pixel[i][j].r,
+                                   img.pixel[i][j].g,
+                                   img.pixel[i][j].b);
 
         }
         printf("\n");
