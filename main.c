@@ -36,66 +36,76 @@ Image ler_imagem(Image img) {
 
 }
 
-int max(int a, int b) {
+int min(int a, int b) {
   if (a > b)
     return b;
   return a;
 }
 
-int media_escala_de_cinza(int argumento1, int argumento2, int argumento3) {
-    int soma = argumento1 + argumento2 + argumento3;
+int max(int a, int b) {
+  if (a > b)
+    return a;
+  return b;
+}
 
-    return soma/3;
+Pixel media_escala_de_cinza(Pixel pixel) {
+    unsigned short int soma = pixel.r + pixel.g + pixel.b;
+
+    Pixel media = {};
+    media.r = soma/3;
+    media.g = soma/3;
+    media.b = soma/3;
+
+    return media;
 }
 
 Image escala_de_cinza(Image img) {
-    /*for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            print("%u", img.pixel[i][j].r + img.pixel[i][j].g + img.pixel[i][j].b);
-        }
-    }*/
 
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            int media = media_escala_de_cinza(img.pixel[i][j].r,
-                                              img.pixel[i][j].g,
-                                              img.pixel[i][j].b);
-
-            img.pixel[i][j].r = media;
-            img.pixel[i][j].g = media;
-            img.pixel[i][j].b = media;
+            Pixel media = media_escala_de_cinza(img.pixel[i][j]);
+            img.pixel[i][j] = media;
         }
     }
 
     return img;
 }
 
+Pixel soma_blur(Pixel pixel, Pixel soma) {
+
+  soma.r += pixel.r;
+  soma.g += pixel.g;
+  soma.b += pixel.b;
+
+  return soma;
+}
+
+Pixel media_blur(Pixel media, int T) {
+
+  media.r /= T * T;
+  media.g /= T * T;
+  media.b /= T * T;
+
+  return media;
+}
+
 Image blur(Image img) {
     int T = 0;
     scanf("%d", &T);
 
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            Pixel media = {0, 0, 0};
+    for (unsigned short int i = 0; i < img.height; ++i) {
+        for (unsigned short int j = 0; j < img.width; ++j) {
+            Pixel soma = {0, 0, 0};
 
-            int menor_height = (img.height - 1 > i + T/2) ? i + T/2 : img.height - 1;
-            int min_width = (img.width - 1 > j + T/2) ? j + T/2 : img.width - 1;
-            for(unsigned int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
-                for(unsigned int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
-                    media.r += img.pixel[x][y].r;
-                    media.g += img.pixel[x][y].g;
-                    media.b += img.pixel[x][y].b;
+            int menor_height = min(img.height - 1, i + T/2);
+            int min_width = min(img.width - 1, j + T/2);
+            for(int x = max(0, i - T/2); x <= menor_height; ++x) {
+                for(int y = max(0, j - T/2); y <= min_width; ++y) {
+                    soma = soma_blur(img.pixel[x][y], soma);
                 }
             }
+            img.pixel[i][j] = media_blur(soma, T);
 
-            // printf("%u", media.r)
-            media.r /= T * T;
-            media.g /= T * T;
-            media.b /= T * T;
-
-            img.pixel[i][j].r = media.r;
-            img.pixel[i][j].g = media.g;
-            img.pixel[i][j].b = media.b;
         }
     }
 
@@ -167,7 +177,7 @@ Image cortar_imagem(Image img) {
 int calcular_menor_r(double a, double b, double c, Pixel pixel) {
   int p =  pixel.r * a + pixel.g * b + pixel.b * c;
   //int menor_r = (255 >  p) ? p : 255;
-  int menor_r = max(255, p);
+  int menor_r = min(255, p);
 
   return menor_r;
 }
