@@ -169,9 +169,7 @@ Image cortar_imagem(Image img) {
 
     for(int i = 0; i < height; ++i) {
         for(int j = 0; j < width; ++j) {
-            cortada.pixel[i][j].r = img.pixel[i + y][j + x].r;
-            cortada.pixel[i][j].g = img.pixel[i + y][j + x].g;
-            cortada.pixel[i][j].b = img.pixel[i + y][j + x].b;
+            cortada.pixel[i][j] = img.pixel[i + y][j + x];
         }
     }
 
@@ -190,9 +188,7 @@ Image filtro_sepia(Image img) {
   for (unsigned int x = 0; x < img.height; ++x) {
       for (unsigned int j = 0; j < img.width; ++j) {
           Pixel pixel;
-          pixel.r = img.pixel[x][j].r;
-          pixel.g = img.pixel[x][j].g;
-          pixel.b = img.pixel[x][j].b;
+          pixel = img.pixel[x][j];
 
           img.pixel[x][j].r = calcular_menor_r(0.393, 0.769, 0.189, pixel);
           img.pixel[x][j].g = calcular_menor_r(0.349, 0.686, 0.168, pixel);
@@ -220,17 +216,9 @@ Image espelhamento_vertical(Image img) {
           else x = img.height - 1 - i2;
 
           Pixel aux1;
-          aux1.r = img.pixel[i2][j].r;
-          aux1.g = img.pixel[i2][j].g;
-          aux1.b = img.pixel[i2][j].b;
-
-          img.pixel[i2][j].r = img.pixel[x][y].r;
-          img.pixel[i2][j].g = img.pixel[x][y].g;
-          img.pixel[i2][j].b = img.pixel[x][y].b;
-
-          img.pixel[x][y].r = aux1.r;
-          img.pixel[x][y].g = aux1.g;
-          img.pixel[x][y].b = aux1.b;
+          aux1 = img.pixel[i2][j];
+          img.pixel[i2][j] = img.pixel[x][y];
+          img.pixel[x][y] = aux1;
       }
   }
 
